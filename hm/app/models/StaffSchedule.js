@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const staffScheduleSchema = new mongoose.Schema({
   staffId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  shifts: [{ day: String, startTime: String, endTime: String }],
   availability: [
     {
       day: {
