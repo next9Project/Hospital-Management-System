@@ -1,3 +1,4 @@
+// models/User.js
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
@@ -9,8 +10,9 @@ const userSchema = new mongoose.Schema({
     enum: ["admin", "doctor", "nurse", "patient"],
     required: true,
   },
-  phone: { type: String, required: false },
-  address: { type: String, required: false },
+  phone: { type: String },
+  address: { type: String },
+  profileImage: { type: String, default: null }, // حقل الصورة الشخصية
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
