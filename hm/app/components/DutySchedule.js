@@ -1,4 +1,4 @@
-function DutySchedule({ shifts }) {
+export default function DutySchedule({ shifts }) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Duty Schedule</h2>
@@ -13,4 +13,4 @@ function DutySchedule({ shifts }) {
     );
   }
   
-  module.exports = DutySchedule;
+  

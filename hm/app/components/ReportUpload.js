@@ -1,7 +1,7 @@
 "use client";
 const { useState } = require("react");
 
-function ReportUpload({ patientId, doctorId }) {
+export default function ReportUpload({ patientId, doctorId }) {
   const [file, setFile] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -34,4 +34,3 @@ function ReportUpload({ patientId, doctorId }) {
   );
 }
 
-module.exports = ReportUpload;

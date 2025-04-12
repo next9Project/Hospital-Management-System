@@ -1,7 +1,7 @@
 "use client";
 const { useState } = require("react");
 
-function AppointmentActions({ appointment }) {
+export default function AppointmentActions({ appointment }) {
   const [status, setStatus] = useState(appointment.status);
 
   const handleUpdate = async (newStatus) => {
@@ -31,4 +31,3 @@ function AppointmentActions({ appointment }) {
   );
 }
 
-module.exports = AppointmentActions;
