@@ -1,7 +1,7 @@
 "use client";
 const { useState } = require("react");
 
-function VitalSignsForm({ patientId }) {
+export default function VitalSignsForm({ patientId }) {
   const [form, setForm] = useState({ type: "", value: "" });
 
   const handleSubmit = async (e) => {
@@ -38,4 +38,3 @@ function VitalSignsForm({ patientId }) {
   );
 }
 
-module.exports = VitalSignsForm;

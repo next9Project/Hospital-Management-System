@@ -2,7 +2,7 @@
 const { useState } = require("react");
 const AppointmentActions = require("./AppointmentActions");
 
-function AppointmentCalendar({ appointments, user }) {
+export default function AppointmentCalendar({ appointments, user }) {
   const [view, setView] = useState("daily");
 
   const filteredAppointments = view === "daily"
@@ -38,4 +38,3 @@ function AppointmentCalendar({ appointments, user }) {
   );
 }
 
-module.exports = AppointmentCalendar;
