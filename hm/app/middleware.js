@@ -37,3 +37,53 @@
 // module.exports.config = {
 //   matcher: ["/provider-dashboard/:path*"], // تأكد من تطابق المسار
 // };
+
+
+
+
+
+// import { NextResponse } from "next/server";
+// import jwt from "jsonwebtoken";
+
+// const PUBLIC_PATHS = ["/", "/login", "/register", "/about", "/contact"];
+
+// export async function middleware(request) {
+//   const { pathname } = request.nextUrl;
+//   const token = request.cookies.get("token")?.value;
+
+//   // السماح بالصفحات العامة
+//   if (PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/_next")) {
+//     return NextResponse.next();
+//   }
+
+//   // لا يوجد توكن = إعادة توجيه لتسجيل الدخول
+//   if (!token) {
+//     return NextResponse.redirect(new URL("/login", request.url));
+//   }
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     const role = decoded.role;
+// console.log(role)
+//     // توجيه حسب الدور
+//     if (pathname === "/dashboard") {
+//       if (role === "admin") {
+//         return NextResponse.redirect(new URL("/admin-dashboard", request.url));
+//       }
+//       if (role === "doctor") {
+//         return NextResponse.redirect(new URL("/provider-dashboard", request.url));
+//       }
+//       if (role === "patient") {
+//         return NextResponse.redirect(new URL("/profile", request.url));
+//       }
+//     }
+
+//     return NextResponse.next();
+//   } catch (err) {
+//     return NextResponse.redirect(new URL("/login", request.url));
+//   }
+// }
+
+// export const config = {
+//   matcher: ["/((?!api|_next/static|favicon.ico).*)"], // تجاهل ملفات النظام
+// };

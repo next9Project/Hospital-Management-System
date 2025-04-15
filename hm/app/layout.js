@@ -1,8 +1,9 @@
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,18 +20,32 @@ export const metadata = {
   description: "موقع عيادة تجميل لحجز المواعيد والخدمات",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
+
+  let role = null;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      role = decoded?.role;
+    } catch (err) {
+      console.error("Invalid token", err);
+    }
+  }
+
+  const showLayout = role === "patient";
+
   return (
     <html lang="ar" dir="rtl">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-pink-50 text-gray-800`}
-      >
-        <>
-        <Navbar/>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-pink-50 text-gray-800`}>
+        {showLayout && <Navbar />}
         {children}
-        <Footer/>
-        </>
+        {showLayout && <Footer />}
       </body>
     </html>
   );
 }
+
+

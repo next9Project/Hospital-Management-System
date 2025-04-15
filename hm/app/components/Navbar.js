@@ -1,17 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const router = useRouter();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/profile", { credentials: "include" });
+        const data = await res.json();
+        setUser(data.user);
+      } catch (err) {
+        console.log("المستخدم غير مسجل أو خطأ في الجلب");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+    });
+
+    setUser(null);
+    router.push("/login");
+  };
+
   return (
-    <nav className="bg-white shadow-md" dir="rtl">
+    <nav className="bg-gradient-to-b from-white to-gray-50 shadow-lg" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           {/* Logo Section */}
@@ -21,7 +47,7 @@ export default function Navbar() {
                 <div className="text-right flex items-center">
                   {/* Flower logo */}
                   <svg
-                    className="h-12 w-12 ml-2 text-pink-600"
+                    className="h-14 w-14 ml-3 text-pink-700"
                     viewBox="0 0 100 100"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -48,12 +74,8 @@ export default function Navbar() {
                     />
                   </svg>
                   <div>
-                    <div className="text-2xl font-bold text-pink-600">
-                      لمسات الجمال
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      عيادة التجميل المتكاملة
-                    </div>
+                    <div className="text-3xl font-extrabold text-pink-700 tracking-tight">لمسات الجمال</div>
+                    <div className="text-xs text-gray-500 font-medium">عيادة التجميل المتكاملة</div>
                   </div>
                 </div>
               </div>
@@ -63,47 +85,23 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex md:items-center">
             <div className="flex space-x-4 space-x-reverse">
-              <Link
-                href="/"
-                className="text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-2 rounded-md text-md font-medium"
-              >
+              <Link href="/" className="text-gray-700 hover:bg-pink-100 hover:text-pink-700 px-4 py-2.5 rounded-lg text-base font-semibold transition-all duration-300 hover:-translate-y-0.5">
                 الرئيسية
               </Link>
-              <Link
-                href="/services"
-                className="text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-2 rounded-md text-md font-medium"
-              >
-                خدماتنا
+              <Link href="/appointments" className="text-gray-700 hover:bg-pink-100 hover:text-pink-700 px-4 py-2.5 rounded-lg text-base font-semibold transition-all duration-300 hover:-translate-y-0.5">
+                مواعيدي
               </Link>
-              {/* <Link
-                href="/specialists"
-                className="text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-2 rounded-md text-md font-medium"
-              >
-                الأخصائيون
-              </Link> */}
-              {/* <Link
-                href="/gallery"
-                className="text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-2 rounded-md text-md font-medium"
-              >
-                معرض الصور
-              </Link> */}
-              <Link
-                href="/about"
-                className="text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-2 rounded-md text-md font-medium"
-              >
+              <Link href="/about" className="text-gray-700 hover:bg-pink-100 hover:text-pink-700 px-4 py-2.5 rounded-lg text-base font-semibold transition-all duration-300 hover:-translate-y-0.5">
                 من نحن
               </Link>
-              <Link
-                href="/contact"
-                className="text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-2 rounded-md text-md font-medium"
-              >
+              <Link href="/contact" className="text-gray-700 hover:bg-pink-100 hover:text-pink-700 px-4 py-2.5 rounded-lg text-base font-semibold transition-all duration-300 hover:-translate-y-0.5">
                 اتصل بنا
               </Link>
             </div>
 
             <Link
               href="/appointment"
-              className="mr-4 bg-pink-600 text-white hover:bg-pink-500 px-5 py-2 rounded-lg text-md font-medium transition-colors duration-300 shadow-md hover:shadow-lg flex items-center"
+              className="mr-4 bg-gradient-to-r from-pink-600 to-pink-700 text-white hover:from-pink-700 hover:to-pink-800 px-6 py-2.5 rounded-xl text-base font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center"
             >
               <svg
                 className="w-5 h-5 ml-1"
@@ -121,13 +119,48 @@ export default function Navbar() {
               </svg>
               احجز موعد
             </Link>
+
+            {/* user info or login button */}
+            {user ? (
+              <div className="flex items-center gap-2 mr-4">
+                <Link href="/profile">
+                  {user.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt="صورة المستخدم"
+                      className="w-9 h-9 rounded-full border-2 border-pink-400 cursor-pointer transition-transform duration-200 hover:scale-110 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-pink-200 flex items-center justify-center text-pink-700 font-semibold cursor-pointer transition-transform duration-200 hover:scale-110 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2">
+                      {user.name?.charAt(0)}
+                    </div>
+                  )}
+                </Link>
+                <div className="flex flex-col items-end">
+                  <span className="text-gray-700 font-medium">{user.name}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-xs text-red-600 font-medium hover:text-red-700 hover:underline transition-colors duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  >
+                    تسجيل الخروج
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="mr-4 bg-pink-100 text-pink-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-pink-200 transition-all duration-300 hover:shadow-sm focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+              >
+                تسجيل الدخول
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-pink-600 focus:outline-none"
+              className="inline-flex items-center justify-center p-2.5 rounded-lg text-gray-700 hover:text-pink-700 hover:bg-pink-50 transition-all duration-200 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
             >
               <svg
                 className="h-6 w-6"
@@ -147,79 +180,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-white pb-4">
-          <div className="pt-2 px-4 space-y-1">
-            <Link
-              href="/"
-              className="block text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-3 rounded-md text-base font-medium border-b border-gray-100"
-              onClick={toggleMenu}
-            >
-              الرئيسية
-            </Link>
-            <Link
-              href="/services"
-              className="block text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-3 rounded-md text-base font-medium border-b border-gray-100"
-              onClick={toggleMenu}
-            >
-              خدماتنا
-            </Link>
-            {/* <Link
-              href="/specialists"
-              className="block text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-3 rounded-md text-base font-medium border-b border-gray-100"
-              onClick={toggleMenu}
-            >
-              الأخصائيون
-            </Link> */}
-            {/* <Link
-              href="/gallery"
-              className="block text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-3 rounded-md text-base font-medium border-b border-gray-100"
-              onClick={toggleMenu}
-            >
-              معرض الصور
-            </Link> */}
-            <Link
-              href="/about"
-              className="block text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-3 rounded-md text-base font-medium border-b border-gray-100"
-              onClick={toggleMenu}
-            >
-              من نحن
-            </Link>
-            <Link
-              href="/contact"
-              className="block text-gray-600 hover:bg-pink-50 hover:text-pink-600 px-3 py-3 rounded-md text-base font-medium border-b border-gray-100"
-              onClick={toggleMenu}
-            >
-              اتصل بنا
-            </Link>
-            <div className="pt-2">
-              <Link
-                href="/appointment"
-                className="flex justify-center items-center w-full bg-pink-600 text-white hover:bg-pink-500 px-3 py-3 rounded-md text-base font-medium transition-colors duration-300"
-                onClick={toggleMenu}
-              >
-                <svg
-                  className="w-5 h-5 ml-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                احجز موعد
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

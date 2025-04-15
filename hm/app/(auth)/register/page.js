@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -27,53 +28,74 @@ export default function RegisterPage() {
     try {
       const response = await axios.post("/api/auth/register", formData);
       if (response.status === 201) {
-        router.push("/login");
+        await Swal.fire({
+          title: "تم التسجيل بنجاح!",
+          text: "تم إنشاء حسابك بنجاح",
+          icon: "success",
+          confirmButtonText: "حسناً",
+          confirmButtonColor: "#ec4899", // Pink color to match your theme
+        });
+        
+        // Redirect based on role
+        const { role } = formData;
+        if (role === "doctor") {
+          router.push("/provider-dashboard");
+        } else if (role === "admin") {
+          router.push("/admin-dashboard");
+        } else {
+          router.push("/"); // Default to home page for patient
+        }
       }
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.error);
       } else {
-        setError("Something went wrong. Please try again.");
+        setError("حدث خطأ ما. يرجى المحاولة مرة أخرى.");
       }
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#1D1D1D] text-[#FFFFFF]">
-      <div className="container mx-auto px-4 py-10 max-w-2xl">
-        <div className="bg-[#303241] rounded-xl shadow-2xl overflow-hidden">
+    <div dir="rtl" className="min-h-screen bg-pink-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-2xl">
+        {/* Card */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+          {/* Header with branded accent */}
+          <div className="h-3 bg-gradient-to-r from-pink-500 to-pink-600"></div>
+
           {/* Error message */}
           {error && (
-            <div className="bg-red-500 bg-opacity-10 border-l-4 border-red-500 p-4">
-              <div className="flex">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-red-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <p className="ml-2 text-sm text-red-400">{error}</p>
-              </div>
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 text-sm flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>{error}</span>
             </div>
           )}
 
           {/* Form */}
           <div className="p-8">
-            <form className="space-y-8" onSubmit={handleSubmit}>
-              <h2 className="text-xl font-semibold text-white mb-6">
-                Create an Account
-              </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+              إنشاء حساب جديد
+            </h2>
 
+            <form className="space-y-5" onSubmit={handleSubmit}>
               {/* Name */}
-              <div className="space-y-1">
-                <label htmlFor="name" className="block text-sm font-medium">
-                  Full Name
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  الاسم الكامل
                 </label>
                 <input
                   id="name"
@@ -82,15 +104,18 @@ export default function RegisterPage() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  placeholder="John Doe"
-                  className="block w-full px-4 py-3 bg-[#1D1D1D] border border-[#1D1D1D] rounded-lg text-white placeholder-[#C8C8C8] focus:ring-2 focus:ring-[#FCAA29] focus:outline-none"
+                  placeholder="محمد أحمد"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition text-right"
                 />
               </div>
 
               {/* Email */}
-              <div className="space-y-1">
-                <label htmlFor="email" className="block text-sm font-medium">
-                  Email Address
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  البريد الإلكتروني
                 </label>
                 <input
                   id="email"
@@ -99,15 +124,18 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  placeholder="you@example.com"
-                  className="block w-full px-4 py-3 bg-[#1D1D1D] border border-[#1D1D1D] rounded-lg text-white placeholder-[#C8C8C8] focus:ring-2 focus:ring-[#FCAA29] focus:outline-none"
+                  placeholder="example@email.com"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition text-right"
                 />
               </div>
 
               {/* Password */}
-              <div className="space-y-1">
-                <label htmlFor="password" className="block text-sm font-medium">
-                  Password
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  كلمة المرور
                 </label>
                 <input
                   id="password"
@@ -117,17 +145,20 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   placeholder="••••••••"
-                  className="block w-full px-4 py-3 bg-[#1D1D1D] border border-[#1D1D1D] rounded-lg text-white placeholder-[#C8C8C8] focus:ring-2 focus:ring-[#FCAA29] focus:outline-none"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition text-right"
                 />
-                <p className="text-xs text-[#C8C8C8] mt-1">
-                  Must be at least 8 characters
+                <p className="text-xs text-gray-600 mt-1 text-right">
+                  يجب أن تتكون من 8 أحرف على الأقل
                 </p>
               </div>
 
               {/* Phone */}
-              <div className="space-y-1">
-                <label htmlFor="phone" className="block text-sm font-medium">
-                  Phone Number
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  رقم الهاتف
                 </label>
                 <input
                   id="phone"
@@ -135,15 +166,18 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+1 (555) 123-4567"
-                  className="block w-full px-4 py-3 bg-[#1D1D1D] border border-[#1D1D1D] rounded-lg text-white placeholder-[#C8C8C8] focus:ring-2 focus:ring-[#FCAA29] focus:outline-none"
+                  placeholder="+966 50 123 4567"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition text-right"
                 />
               </div>
 
               {/* Address */}
-              <div className="space-y-1">
-                <label htmlFor="address" className="block text-sm font-medium">
-                  Address
+              <div>
+                <label
+                  htmlFor="address"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  العنوان
                 </label>
                 <input
                   id="address"
@@ -151,34 +185,58 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="123 Main St, City"
-                  className="block w-full px-4 py-3 bg-[#1D1D1D] border border-[#1D1D1D] rounded-lg text-white placeholder-[#C8C8C8] focus:ring-2 focus:ring-[#FCAA29] focus:outline-none"
+                  placeholder="شارع الملك فهد، الرياض"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition text-right"
                 />
+              </div>
+
+              {/* Role */}
+              <div>
+                <label
+                  htmlFor="role"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  الدور
+                </label>
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition text-right"
+                >
+                  <option value="patient">مريض</option>
+                  <option value="doctor">طبيب</option>
+                  <option value="admin">مدير</option>
+                </select>
               </div>
 
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 rounded-lg font-medium text-white bg-gradient-to-r from-[#FC7729] to-[#FCAA29] hover:from-[#FCAA29] hover:to-[#FC7729] focus:ring-2 focus:ring-offset-2 focus:ring-[#FCAA29] transition-all"
+                className="w-full bg-pink-600 hover:bg-pink-500 text-white py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-lg mt-6"
               >
-                Create Account
+                إنشاء حساب
               </button>
+            </form>
 
-              <p className="text-sm text-center text-[#C8C8C8] pt-4">
-                Already have an account?{" "}
+            <div className="text-center mt-6">
+              <p className="text-sm text-gray-600">
+                لديك حساب بالفعل؟{" "}
                 <a
                   href="/login"
-                  className="text-[#FCAA29] font-medium hover:text-[#FC7729]"
+                  className="text-pink-600 hover:text-pink-500 font-medium"
                 >
-                  Sign in
+                  تسجيل الدخول
                 </a>
               </p>
-            </form>
+            </div>
           </div>
         </div>
 
-        <p className="mt-6 text-center text-xs text-[#C8C8C8]">
-          © 2025 Your Company. All rights reserved.
+        <p className="mt-6 text-center text-xs text-gray-600">
+          © 2025. جميع الحقوق محفوظة.
         </p>
       </div>
     </div>
